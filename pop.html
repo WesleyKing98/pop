@@ -15,6 +15,7 @@
 
 
 		#board{
+	
 			position: relative;
 			width:100vw;
 			height:100vw;
@@ -126,11 +127,12 @@
 	
 
 angle = 320
-rotateSpeed = 1;
+rotateSpeed = 5;
 
 
-targetSpot = 0;
+targetSpot = 50;
 targetRange = 11 // The angle space above and below the target
+targetSpeed = 5;
 
 targetBottom =0;
 targetTop =0;
@@ -143,30 +145,57 @@ target = document.getElementById('target') // the target circle itself
 
 spinner = document.getElementById('spinner');
 
+isColliding = false;
+
+function collisionCheck(){
+
+	if (targetTop < targetBottom){
+		return(angle >= targetBottom || angle <= targetTop); //This is if the range overlaps 360 & 0
+	}else{
+		return(angle >= targetBottom && angle <=targetTop);
+	}
+}
+
+
 function mainLoop(){
 
 
-if (angle >360){
-	angle -=360;
-}
+if (angle >360){angle -=360;} // Makes sure the player angle never leaves 0-360 range
+if (angle < 0){angle +=360;}
+
+if (targetSpot >360){targetSpot -=360;}
+if (targetSpot < 0){targetSpot +=360;}
+
+
+targetSpinner.style.transform = "rotate("+targetSpot+"deg)";
+
+
 targetBottom = targetSpot - targetRange;
 targetTop = targetSpot + targetRange;
 
-
 if (targetBottom < 0){targetBottom+=360}
-
 if (targetTop > 360){targetBottom-=360}
 
-if (angle > targetBottom && angle <=360 || angle > 0 && angle <= targetTop){
+isColliding = collisionCheck();
+
+if (isColliding){
 	target.style.backgroundColor="red";
+	document.getElementById('t3').style.color = "green";
+	targetSpot += ((Math.random()*20)+40)*rotateSpeed;
+	rotateSpeed = -rotateSpeed;
 }else{
 	target.style.backgroundColor="yellow";
+	document.getElementById('t3').style.color = "red";
+
 }
 
 
 
 angle+=rotateSpeed;
+
+
 spinner.style.transform = "rotate("+angle+"deg)";
+
 
 document.getElementById('t1').innerText = targetTop;
 document.getElementById('t2').innerText = targetBottom;
